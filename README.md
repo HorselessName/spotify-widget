@@ -1,19 +1,22 @@
 # Spotify Widget
 
-This is a small HTML widget that can be used to display your currently playing Spotify song in websites.
+Esse Widget mostra a música que está tocando no momento no Spotify.
+Ele depende de algumas coisas, devido a forma que o Spotify lida com a API deles.
 
-File | Purpose 
---- | --- 
-player.html | Frontend file containing pure HTML, CSS and JS.
-player.min.html | Minified version of the above file.
-worker.js | Backend JS file that handles acts as a middleman between the frontend and Spotify.
-usage.html | Example HTML file showing how the widget can be embedded in a website. 
-testing.frame.html | Testing HTML file to locally embed the widget during development. 
-------
-See this widget in action;
+## Como usar
 
-https://blog.naushikha.com/p/music.html
+- Você precisa de uma API que vai servir de intermediador para os requests.
 
-If you want to learn how to set this up in your own blog, check out the guide;
+A API de Exemplo do Repositório utilizado foi feita utilizando o Express,
+pra ser simples e direto.
 
-https://blog.naushikha.com/2021/05/lets-deploy-your-own-spotify-widget.html
+- npm init
+- npm install express
+- npm install dotenv
+
+Utilize a API para gerar o Token de acesso do Spotify para fazer seus REQUESTS.
+Por padrão, o Token dura somente 1 Hora, então foi configurada uma CRON na API para ficar gerando um novo token a cada 50 minutos.
+
+## Exemplos de Uso do Widget
+
+- Em Progresso.
