@@ -31,12 +31,19 @@ if (!fs.existsSync('.env')) {
             });
         });
     });
+
+    // Verificar se o valor do TOKEN_EXPIREDATE existe no arquivo .env, se não, crio a variavel de ambiente.
+    if (!process.env.TOKEN_EXPIREDATE) {
+        process.env.TOKEN_EXPIREDATE = new Date().toISOString();
+    }
 }
 
 // #### Configuração do Servidor (Depois das Configurações do .env estarem criadas.) ####
-const routes = require('./express.routes');
+const authRoutes = require('./routes.auth');
+const tokenRoutes = require('./routes.token');
 const app = express();
-app.use('/auth', routes)
+app.use('/auth', authRoutes)
+app.use('/token', tokenRoutes)
 
 // Imprimir as rotas. Ref. https://stackoverflow.com/a/28199817/8297745
 function printRoutes(stack, parentPath = '') {
