@@ -1,0 +1,17 @@
+{
+  "album": {
+    "album_name": "Purpose (Deluxe)",
+    "album_url": "https://open.spotify.com/album/6Fr2rQkZ383FcMqFyT7yPr",
+    "album_image": "https://i.scdn.co/image/ab67616d00004851f46b9d202509a8f7384b90de"
+  },
+  "musica": {
+    "musica_nome": "Sorry",
+    "tocando_agora": true,
+    "ms_duracao": 200786,
+    "ms_posicao": 70056
+  },
+  "artista": {
+    "artista_nome": "Justin Bieber",
+    "artista_url": "https://open.spotify.com/artist/1uNFoZAHBGtllmzznpCI3s"
+  }
+}

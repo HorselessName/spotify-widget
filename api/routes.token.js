@@ -9,19 +9,28 @@ const {
 
 // Rota para Obter o access_token.
 router.get('/get', (req, res) => {
-    // Lê o access_token do arquivo .env
     const accessToken = process.env.ACCESS_TOKEN;
     const expiresIn = process.env.TOKEN_EXPIREDATE;
+    console.log(`Obtendo o token do Spotify... GET /token/get. \nToken Expire Date: ${expiresIn}`);
 
     if (!accessToken) {
-        // Se não encontrar o access_token, retorna status 404 com mensagem
         res.status(404).send({ message: 'Access token not found.' });
     } else {
-        // Se encontrar, retorna o access_token em um objeto JSON
-        res.status(200).send({
-            access_token: accessToken,
-            expires_in: expiresIn,
-        });
+        const horaAtual = new Date();
+        const horaTokenExpira = new Date(expiresIn);
+
+        if (horaAtual < horaTokenExpira) {
+            res.status(200).send({
+                message: 'Token expirou.',
+                expired_at: expiresIn
+            });
+        } else {
+            // Se o token ainda for válido, retorna o token e a data de expiração
+            res.status(200).send({
+                access_token: accessToken,
+                expires_in: expiresIn
+            });
+        }
     }
 });
 
@@ -52,6 +61,7 @@ router.get('/refresh', async (req, res) => {
 
     try {
         // Realiza a requisição para o endpoint do Spotify
+        console.log("Atualizando o token do Spotify... GET /token/refresh.")
         const response = await axios(payload);
 
         // Atualiza os tokens no arquivo .env

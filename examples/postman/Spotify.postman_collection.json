@@ -1,13 +1,13 @@
 {
 	"info": {
 		"_postman_id": "cb0d3214-ca87-449a-b90d-4de2044be2c8",
-		"name": "Spotify Stuff",
+		"name": "Spotify",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "17452367"
 	},
 	"item": [
 		{
-			"name": "Spotify",
+			"name": "Requests / API",
 			"item": [
 				{
 					"name": "Spotify - Pegar Token",
@@ -58,18 +58,49 @@
 								"exec": [
 									"// Verifica se a resposta é OK (status 200)\r",
 									"if (pm.response.code === 200) {\r",
-									"    // Extrai a resposta como JSON\r",
-									"    var responseData = pm.response.json();\r",
+									"    var item = pm.response.json().item;\r",
+									"\r",
+									"    // Status da Musica (Tocando, MS se Tocando)\r",
+									"    var musica_status = {\r",
+									"        tocando_agora: pm.response.json().is_playing,\r",
+									"        ms_posicao: pm.response.json().progress_ms\r",
+									"    }\r",
+									"\r",
+									"    var artista = {\r",
+									"        artista_nome: item.artists[0].name,\r",
+									"        artista_url: item.artists[0].external_urls.spotify\r",
+									"    };\r",
+									"\r",
+									"    var album = {\r",
+									"        album_name: item.album.name,\r",
+									"        album_url: item.album.external_urls.spotify,\r",
+									"        album_image: item.album.images.find(image => image.height === 64 && image.width === 64).url\r",
+									"    };\r",
+									"\r",
+									"    // Itera sobre as chaves do objeto item e adiciona ao objeto musicaInfo\r",
+									"    var musica = {\r",
+									"        musica_nome: item.name,\r",
+									"        tocando_agora: musica_status.tocando_agora,\r",
+									"        ms_duracao: item.duration_ms,\r",
+									"        ms_posicao: musica_status.ms_posicao\r",
+									"    };\r",
+									"\r",
+									"    // Estrutura final a ser exibida\r",
+									"    var tocando_agora = {\r",
+									"        album: album,\r",
+									"        musica: musica,\r",
+									"        artista: artista\r",
+									"    };\r",
 									"\r",
 									"    // Define o template como um JSON puro\r",
 									"    var template = `\r",
-									"        <pre>{{responseData}}</pre>\r",
+									"        <pre>{{ tocando_agora }}</pre>\r",
 									"    `;\r",
 									"\r",
 									"    // Define a resposta visualizada no Postman\r",
 									"    pm.visualizer.set(\r",
-									"        template, { responseData: JSON.stringify(responseData, null, 2) }\r",
-									"        );\r",
+									"        template, { tocando_agora: JSON.stringify( tocando_agora, null, 2 ) }\r",
+									"    );\r",
 									"}\r",
 									""
 								],
@@ -110,6 +141,26 @@
 									"value": "BR",
 									"description": "Country Code"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Spotify - Refresh Token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/token/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"token",
+								"refresh"
 							]
 						}
 					},

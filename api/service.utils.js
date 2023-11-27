@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 function atualizarEnvTokens(accessToken, refreshToken, tokenExpireDate) {
+    console.log("New Token Expire Date: " + tokenExpireDate.toISOString());
     const envPath = path.resolve(__dirname, '.env');
     let envContents = fs.readFileSync(envPath, 'utf-8');
 

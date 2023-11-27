@@ -154,16 +154,18 @@
                     document.getElementById("player-artist").innerHTML = "  ";
                     return;
                 }
+
                 songData = data;
+
                 document.getElementById("player-song").innerHTML = data.item.name;
-                document.getElementById("player-artist").innerHTML =
-                    data.item.artists[0].name;
+                document.getElementById("player-artist").innerHTML = data.item.artists[0].name;
                 document.getElementById("player-status").innerHTML = data.is_playing
+
                     ? `▶️ ${spotifyUser}'s now playing...`
                     : `⏸ ${spotifyUser} has paused.`;
-                document
-                    .getElementById("player-album-art")
-                    .setAttribute("src", data.item.album.images[1].url);
+
+                document.getElementById("player-album-art").setAttribute("src", data.item.album.images[1].url);
+
                 document
                     .getElementById("player-progress")
                     .setAttribute(
