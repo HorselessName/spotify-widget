@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "cb0d3214-ca87-449a-b90d-4de2044be2c8",
+		"name": "Spotify Stuff",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17452367"
+	},
+	"item": [
+		{
+			"name": "Spotify",
+			"item": [
+				{
+					"name": "Spotify - Pegar Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifica se a resposta é OK (status 200)\r",
+									"if (pm.response.code === 200) {\r",
+									"    // Extrai o access_token da resposta\r",
+									"    var responseData = pm.response.json();\r",
+									"    var accessToken = responseData.access_token;\r",
+									"\r",
+									"    // Salva o access_token em uma variável de ambiente\r",
+									"    pm.environment.set(\"access_token\", accessToken);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/token/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"token",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Spotify - Current Playing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifica se a resposta é OK (status 200)\r",
+									"if (pm.response.code === 200) {\r",
+									"    // Extrai a resposta como JSON\r",
+									"    var responseData = pm.response.json();\r",
+									"\r",
+									"    // Define o template como um JSON puro\r",
+									"    var template = `\r",
+									"        <pre>{{responseData}}</pre>\r",
+									"    `;\r",
+									"\r",
+									"    // Define a resposta visualizada no Postman\r",
+									"    pm.visualizer.set(\r",
+									"        template, { responseData: JSON.stringify(responseData, null, 2) }\r",
+									"        );\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.spotify.com/v1/me/player/currently-playing?market=BR",
+							"protocol": "https",
+							"host": [
+								"api",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"v1",
+								"me",
+								"player",
+								"currently-playing"
+							],
+							"query": [
+								{
+									"key": "market",
+									"value": "BR",
+									"description": "Country Code"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Spotify Collections for using Spotify API and Local API for Managing Token.\n\nDon't forget to set environment variable `access_token`."
+		}
+	]
+}
