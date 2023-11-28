@@ -78,11 +78,15 @@
     }
 
     function setProgress() {
-        if (progressSeconds > totalSeconds) return clearInterval(progressInterval), void updatePlayer();
+        if (progressSeconds > totalSeconds) return clearInterval(progressInterval)
+        void updatePlayer();
         ++progressSeconds;
-        var e = pad(parseInt(totalSeconds / 60)) + ":" + pad(totalSeconds % 60),
+
+        const e = pad(parseInt(totalSeconds / 60)) + ":" + pad(totalSeconds % 60),
             t = pad(parseInt(progressSeconds / 60)) + ":" + pad(progressSeconds % 60);
-        document.getElementById("player-time").innerHTML = t + " / " + e, document.getElementById("player-progress").style.width = `${100 * progressSeconds / totalSeconds}%`
+
+        document.getElementById("player-time").innerHTML = t + " / " + e
+        document.getElementById("player-progress").style.width = `${100 * progressSeconds / totalSeconds}%`
     }
 
     function pad(e) {

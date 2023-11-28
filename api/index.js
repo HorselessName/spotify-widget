@@ -6,6 +6,24 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+// TODO: Achar outra forma mais otimizada de sincronizar o .env com o process.env.
+
+// Função para recarregar o arquivo .env
+function reloadEnv() {
+    const envConfig = dotenv.parse(fs.readFileSync('.env'));
+    for (const k in envConfig) {
+        process.env[k] = envConfig[k];
+    }
+}
+
+// Monitora mudanças no arquivo .env e recarrega as variáveis de ambiente
+fs.watch('.env', (eventType, filename) => {
+    if (filename && eventType === 'change') {
+        console.log('Arquivo .env modificado. Recarregando variáveis de ambiente...');
+        reloadEnv();
+    }
+});
+
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -41,7 +59,55 @@ if (!fs.existsSync('.env')) {
 // #### Configuração do Servidor (Depois das Configurações do .env estarem criadas.) ####
 const authRoutes = require('./routes.auth');
 const tokenRoutes = require('./routes.token');
+
+const cors = require('cors');
 const app = express();
+
+// Correção do CORs: Access-Control-Allow-Origin dando erro com `Origin: Null`.
+app.use((req, res, next) => {
+    // Esse Middleware é executado DEPOIS do Cors (Mesmo estando antes dele no código).
+    res.header('Access-Control-Allow-Origin', req.get('origin'));
+    res.header('Access-Control-Allow-Headers', 'Allowed-URI');
+    next();
+});
+
+const corsOptionsDelegate = function (req, callback) {
+    // Fluxo: 1. Recebe o PreFlight (Front-End) -> 2. Faz o OPTIONS -> 3. Retorna para o Front-End.
+    let corsOptions;
+
+    console.log("\n#### Verificação do CORS ####\nHeaders: ", req.headers);
+
+    corsOptions = {
+        origin: '*',
+        methods: 'GET',
+        allowedHeaders: ['Content-Type', 'Authorization', 'Allowed-URI'],
+        credentials: true
+    };
+
+    // Verifica se a origem é null
+    if (req.headers.origin === 'null') {
+        // Verifica se Allowed-URI está presente e é localhost
+        if (req.headers['allowed-uri'] === 'http://localhost/') {
+            corsOptions.origin = '*'; // Permite a solicitação
+        } else {
+            corsOptions.origin = false; // Bloqueia a solicitação
+        }
+    }
+
+    callback(null, corsOptions); // Retorna as opções do CORS
+};
+
+app.use(cors(corsOptionsDelegate));
+
+// Middleware pra debug dos requests (Erro Cors)
+app.use(
+    (req, res, next) => {
+        console.log(`Request: ${req.method} ${req.url}
+        \nOrigin: ${req.get('origin')} - Allowed URI: ${req.get('Allowed-URI')}`);
+        next();  // Avançar p/ próxima rota ou MiddleWare.
+    }
+)
+
 app.use('/auth', authRoutes)
 app.use('/token', tokenRoutes)
 
