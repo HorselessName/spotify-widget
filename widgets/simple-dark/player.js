@@ -82,7 +82,9 @@ function getCurrentPlaying(accessToken, callback) {
             const album = new Album(
                 item["album"].name,
                 item["album"]["external_urls"]["spotify"],
-                item.album.images.find(image => image.height === 64 && image.width === 64).url
+                item.album.images.find(image => (
+                    image.height === 300 &&
+                    image.width === 300)).url
             );
 
             const musica = new Musica(
@@ -112,7 +114,7 @@ let musicaAtual;
 
 // Função: Formata o Progresso - Tempo minutos/segundos;
 // Calcula o percentual de progresso.
-function formatarProgresso(tempoAtualMs, tempoTotalMs) {
+function formatarProgresso(tempoAtualMs, tempoTotalMs, ...args) {
     let tempoTotalSegundos = Math.ceil(tempoTotalMs / 1000);
     let tempoAtualSegundos = Math.ceil(tempoAtualMs / 1000);
 
@@ -127,25 +129,53 @@ function formatarProgresso(tempoAtualMs, tempoTotalMs) {
     let tempoTotalFormatado = `${minutosTotal}:${segundosTotal < 10 ? '0' : ''}${segundosTotal}`;
     let tempoAtualFormatado = `${minutosAtual}:${segundosAtual < 10 ? '0' : ''}${segundosAtual}`;
 
-    return `Progresso: ${percentualProgresso.toFixed(2)}% - Tempo: ${tempoAtualFormatado} / ${tempoTotalFormatado}`;
+    return {
+        tempoTotalFormatado: tempoTotalFormatado,
+        tempoAtualFormatado: tempoAtualFormatado,
+        percentualProgresso: `${percentualProgresso.toFixed(2)}%`,
+
+        // Retornar o restante dos argumentos passados no `...args`
+        ...args,
+    };
 }
 
 // Função: Centralizar aqui as lógicas de população dos dados no HTML.
+// Método para atualizar somente informações dinâmicas (Que precisam de constantes atualizações).
 function popularDados(musica) {
-    // Atualiza o título da música
-    const tituloDiv = document.querySelector('.title');
-    tituloDiv.textContent = musica.nome;
-
     // Atualiza a barra de progresso
     const progressBar = document.querySelector('.timer .bg .progress-bar');
     if (progressBar) {
         const percentualProgresso = (musica.posicaoMs / musica.duracaoMs) * 100;
         progressBar.style.width = `${percentualProgresso.toFixed(2)}%`;
     }
+
+    // Atualiza o tempo atual da música.
+    const tempoAtualDiv = document.querySelector('.time-tracker .time');
+    if (tempoAtualDiv) {
+        const tempoAtual = formatarProgresso(musica.posicaoMs, musica.duracaoMs);
+        tempoAtualDiv.textContent = tempoAtual.tempoAtualFormatado;
+    }
 }
 
-// Função: Sincroniza os dados do Spotify com o do Widget.
-function syncWithSpotify(musica) {
+// Função: Usada pra popular os dados que só precisam ser populados uma vez.
+function popularDadosUmaVez(
+    musica = {},
+    album = {},
+    artista = {}
+) {
+
+    // Atualiza o título da música
+    const tituloDiv = document.querySelector('.title');
+    tituloDiv.textContent = musica.nome;
+
+    // Atualiza a imagem do album
+    const albumImage = document.querySelector('.album-art .album-img');
+    albumImage.src = album.imagem;
+
+}
+
+// Função: Sincroniza os dados do Spotify com o do Widget. (Optional Arguments - `...args`)
+function syncWithSpotify(musica, ...args) {
     // Função Auxiliar: Verificar se a música mudou.
     const musicaMudou = () => {
         if (musicaAtual) return musicaAtual.nome !== musica.nome;
@@ -162,13 +192,13 @@ function syncWithSpotify(musica) {
             "Musica": musica.nome,
             "Posicao": formatarProgresso(Math.ceil(musica.posicaoMs / 1000)),
         });
-
-        // Atualiza os dados do HTML.
-        popularDados(musica);
     }
 
     musicaAtual = musica;
-    popularDados(musica);
+    let albumAtual = args[0];
+
+    // Sempre que a musica atual for setada, precisamos atualizar os dados do HTML.
+    popularDadosUmaVez(musica, albumAtual);
 
     if (musicaAtual.nome !== musica.nome) console.log(`Tocando Agora: ${musica.nome}`);
 
@@ -199,6 +229,9 @@ function syncWithSpotify(musica) {
             return
         }
 
+        // Atualiza os dados do HTML a cada segundo.
+        popularDados(musica);
+
         console.log(formatarProgresso(musica.posicaoMs, musica.duracaoMs));
         musica.posicaoMs += 1000; // Incrementa o tempo atual a cada segundo
 
@@ -217,7 +250,7 @@ function initSyncer() {
 
                 // Sincronizar os dados locais com o Spotify.
                 clearInterval(barraDeProgresso)
-                syncWithSpotify(tocandoAgora.musica);
+                syncWithSpotify(tocandoAgora.musica, tocandoAgora.album);
             });
         });
     };
