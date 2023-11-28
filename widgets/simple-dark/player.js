@@ -130,6 +130,20 @@ function formatarProgresso(tempoAtualMs, tempoTotalMs) {
     return `Progresso: ${percentualProgresso.toFixed(2)}% - Tempo: ${tempoAtualFormatado} / ${tempoTotalFormatado}`;
 }
 
+// Função: Centralizar aqui as lógicas de população dos dados no HTML.
+function popularDados(musica) {
+    // Atualiza o título da música
+    const tituloDiv = document.querySelector('.title');
+    tituloDiv.textContent = musica.nome;
+
+    // Atualiza a barra de progresso
+    const progressBar = document.querySelector('.timer .bg .progress-bar');
+    if (progressBar) {
+        const percentualProgresso = (musica.posicaoMs / musica.duracaoMs) * 100;
+        progressBar.style.width = `${percentualProgresso.toFixed(2)}%`;
+    }
+}
+
 // Função: Sincroniza os dados do Spotify com o do Widget.
 function syncWithSpotify(musica) {
     // Função Auxiliar: Verificar se a música mudou.
@@ -142,13 +156,19 @@ function syncWithSpotify(musica) {
     if (musica.tocandoAgora && !musicaAtual?.tocandoAgora) console.log("Musica Iniciada.");
     if (musicaMudou()) {
         console.log("Musica Mudou.");
+
         // Exibe informações da música atual em formato tabular
         console.table({
             "Musica": musica.nome,
             "Posicao": formatarProgresso(Math.ceil(musica.posicaoMs / 1000)),
         });
+
+        // Atualiza os dados do HTML.
+        popularDados(musica);
     }
+
     musicaAtual = musica;
+    popularDados(musica);
 
     if (musicaAtual.nome !== musica.nome) console.log(`Tocando Agora: ${musica.nome}`);
 
