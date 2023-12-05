@@ -1,81 +1,81 @@
-// // Fluxo de Callback, Assíncrono.
+// Fluxo de Callback, Assíncrono.
+
+function main(callback){
+    console.log("Função Síncrona.")
+
+    // Depois de 2 Segundos vou gerar dados fictícios.
+    setTimeout(
+        () => {
+            const data = {
+                data: "Dados da API..."
+            }
+
+            // Função Callback executada dentro do Handler do setTimeout.
+            console.log("Invocando o Callback (Ver Dados). " +
+                "\nVou passar os dados e uma função para o callback do Ver Dados.")
+            callback(data, callBackProVerDados);
+
+            // O que ele faz:
+            // - Gera a função do argumento, com o valor do data.
+            // - Essa função do argumento é o callback da função main.
+            // - O callback é executado com o valor do data.
+
+        }, 2000
+    );
+}
+
+// Função pra tratar o callback da função main.
+// Essa função por sua vez, também tem um callback.
+function verDados(dados, callBackVerDados){
+    console.log("Função Callback 'Ver Dados' executada da Função Main." +
+        "\nRecebi Dados e Função Callback como Argumento.");
+    setTimeout(
+        () => {
+            // Imprime os dados da API.
+            console.log(dados);
+
+            // Executa o callback da função verDados.
+            // O Callback recebeu o argumento de dentro da `Main`...
+            console.log("Agora, vou chamar o Callback do VerDados...")
+            callBackVerDados();
+        }, 1000
+    );
+}
+
+// Executa por último, porquê é uma Task e tem menos prioridade que a Micro Task.
+setTimeout(
+    () => {
+        console.log("setTimeout - Task...");
+    }, 0
+);
+
+// Executa por Segundo, antes do setTimeout, porquê é uma Micro Task.
+new Promise(
+    (resolve => {
+        // Gera o evento promise com esse valor informado.
+        resolve("Promise - Micro Task...");
+})
+).then(
+    (promiseComValor) => {
+        console.log(`Promise com o Valor Gerado: ${promiseComValor}`)
+    }
+);
+
+// Outro Callback que é chamado na função verDados.
+function callBackProVerDados(){
+    console.log("Outro Callback - Da Função verDados. " +
+        "\nCallback do Ver Dados executado com sucesso.");
+}
+
+// Executa Primeiro - Pq é Síncrono
 //
-// function main(callback){
-//     console.log("Função Síncrona.")
+// Exemplo de Callback.
+// 1. Main Cria um Callback com os dados.
+// 2. Ver Dados recebe o Callback e executa, com outro Callback.
 //
-//     // Depois de 2 Segundos vou gerar dados fictícios.
-//     setTimeout(
-//         () => {
-//             const data = {
-//                 data: "Dados da API..."
-//             }
-//
-//             // Função Callback executada dentro do Handler do setTimeout.
-//             console.log("Invocando o Callback (Ver Dados). " +
-//                 "\nVou passar os dados e uma função para o callback do Ver Dados.")
-//             callback(data, callBackProVerDados);
-//
-//             // O que ele faz:
-//             // - Gera a função do argumento, com o valor do data.
-//             // - Essa função do argumento é o callback da função main.
-//             // - O callback é executado com o valor do data.
-//
-//         }, 2000
-//     );
-// }
-//
-// // Função pra tratar o callback da função main.
-// // Essa função por sua vez, também tem um callback.
-// function verDados(dados, callBackVerDados){
-//     console.log("Função Callback 'Ver Dados' executada da Função Main." +
-//         "\nRecebi Dados e Função Callback como Argumento.");
-//     setTimeout(
-//         () => {
-//             // Imprime os dados da API.
-//             console.log(dados);
-//
-//             // Executa o callback da função verDados.
-//             // O Callback recebeu o argumento de dentro da `Main`...
-//             console.log("Agora, vou chamar o Callback do VerDados...")
-//             callBackVerDados();
-//         }, 1000
-//     );
-// }
-//
-// // Executa por último, porquê é uma Task e tem menos prioridade que a Micro Task.
-// setTimeout(
-//     () => {
-//         console.log("setTimeout - Task...");
-//     }, 0
-// );
-//
-// // Executa por Segundo, antes do setTimeout, porquê é uma Micro Task.
-// new Promise(
-//     (resolve => {
-//         // Gera o evento promise com esse valor informado.
-//         resolve("Promise - Micro Task...");
-// })
-// ).then(
-//     (promiseComValor) => {
-//         console.log(`Promise com o Valor Gerado: ${promiseComValor}`)
-//     }
-// );
-//
-// // Outro Callback que é chamado na função verDados.
-// function callBackProVerDados(){
-//     console.log("Outro Callback - Da Função verDados. " +
-//         "\nCallback do Ver Dados executado com sucesso.");
-// }
-//
-// // Executa Primeiro - Pq é Síncrono
-// //
-// // Exemplo de Callback.
-// // 1. Main Cria um Callback com os dados.
-// // 2. Ver Dados recebe o Callback e executa, com outro Callback.
-// //
-// // Como criamos um Callback na Main, precisamos também passar o mesmo...
-// // E o Callback (Função que vai ser executada ao concluir) é o "verDados".
-// main(verDados);
+// Como criamos um Callback na Main, precisamos também passar o mesmo...
+// E o Callback (Função que vai ser executada ao concluir) é o "verDados".
+main(verDados);
 
 // Exemplo de Fluxo Assíncrono com Async / Await
 
